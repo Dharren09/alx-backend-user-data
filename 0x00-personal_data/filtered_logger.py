@@ -2,9 +2,13 @@
 """function that returns a log mesaage obfuscated"""
 
 import re
+from typing import List
+
+pii_fields = ('name', 'email', 'phone', 'ssn', 'password')
 
 
-def filter_datum(fields, redaction, message, separator):
+def filter_datum(fields: List[str], redaction: str,
+                 message: str, separator: str):
     """creates a regular expression using 2 args then matches any
     specified feilds followed by a separator then captures the feild
     to be replaced"""
