@@ -9,8 +9,8 @@ pii_fields = ('name', 'email', 'phone', 'ssn', 'password')
 
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str):
-    """creates a regular expression using 2 args then matches any
-    specified feilds followed by a separator then captures the feild
-    to be replaced"""
-    return re.sub(r'({0})=[^{1}]+'.format('|'.join(fields), separator),
-                  r'\1={0}'.format(redaction), message)
+    """returns the obfuscated log message"""
+    for field in fields:
+        message_obfuscated = re.sub(f'{field}=.+?{separator}',
+                                    f'{field}={redaction}{separator}', message)
+        return message_obfuscated
