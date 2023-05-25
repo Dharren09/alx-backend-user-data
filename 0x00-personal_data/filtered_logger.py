@@ -7,6 +7,11 @@ from typing import List
 import os
 import mysql.connector
 
+patterns = {
+    'extract': lambda x, y: r'(?P<field>{})=[^{}]*'.format('|'.join(x), y),
+    'replace': lambda x: r'\g<field>={}'.format(x),
+}
+
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
@@ -14,10 +19,8 @@ def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str):
     """creates a regex epresssion to match the fields to obfuscate
     then returns log message obfuscated"""
-    pattern = re.compile(r'(' + '|'.join(fields) + r')=[^' +
-                         separator + r']+' + separator)
-    return re.sub(pattern, lambda match: match.group(1) + '=' +
-                  redaction + separator, message)
+    extract, replace = (patterns["extract"], patterns["replace"])
+    return re.sub(extract(fields, separator), replace(redaction), message)
 
 
 def get_logger() -> logging.Logger:
@@ -40,19 +43,19 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def get_db():
+def get_db() -> mysql.connector.connection.MySQLConnection:
     """Returns a connector to the secure Holberton database"""
-    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
-    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
-    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    database = os.getenv("PERSONAL_DATA_DB_NAME")
+    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME", "")
 
     """Create a connection to the database"""
     connection = mysql.connector.connect(
-        user=username,
-        password=password,
-        host=host,
-        database=database
+        user=db_user,
+        password=db_pwd,
+        host=db_host,
+        database=db_name
     )
 
     return connection
@@ -72,5 +75,7 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """Filters values from the incoming log records using filter_datum"""
-        return filter_datum(self.fields, self.REDACTION,
-                            super().format(record), self.SEPARATOR)
+        message = super(RedactingFormatter, self).format(record)
+        record = filter_datum(self.fields, self.REDACTION,
+                              message, self.SEPARATOR)
+        return record
