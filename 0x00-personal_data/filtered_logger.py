@@ -5,7 +5,8 @@ import re
 
 
 def filter_datum(fields, redaction, message, separator):
-    """constructs a regular expression pattern which matches any feilds
-    followed by any of the args"""
-    regex = r'({0}=)([^{1}]+)'.format('|'.join(fields), separator)
-    return re.sub(regex, r'\1{0}'.format(redaction), message)
+    """creates a regular expression using 2 args then matches any
+    specified feilds followed by a separator then captures the feild
+    to be replaced"""
+    return re.sub(r'({0})=[^{1}]+'.format('|'.join(fields), separator),
+                  r'\1={0}'.format(redaction), message)
