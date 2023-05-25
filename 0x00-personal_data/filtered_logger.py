@@ -5,7 +5,7 @@ import logging
 import re
 from typing import List
 
-pii_fields = ('name', 'email', 'phone', 'ssn', 'password')
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 def filter_datum(fields: List[str], redaction: str,
@@ -16,6 +16,26 @@ def filter_datum(fields: List[str], redaction: str,
                          separator + r']+' + separator)
     return re.sub(pattern, lambda match: match.group(1) + '=' +
                   redaction + separator, message)
+
+
+def get_logger() -> logging.Logger:
+    """Returns a logging.Logger object with the specified configuration."""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    """Read the CSV file and extract field names"""
+    with open("user_data.csv", "r") as file:
+        reader = csv.reader(file)
+        field_names = next(reader)
+
+    """Create a StreamHandler with the RedactingFormatter"""
+    stream_handler = logging.StreamHandler()
+    formatter = RedactingFormatter(fields=field_names)
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    return logger
 
 
 class RedactingFormatter(logging.Formatter):
