@@ -12,9 +12,9 @@ class BasicAuth(Auth):
     def extract_base64_authorization_header(self,
                                             authorization_header: str) -> str:
         """extract base64 authorization header method"""
-        if authorization_header is None or
-        \ type(authorization_header) is not str or
-        \ not authorization_header.startswith('Basic '):
+        if authorization_header is None or \
+                type(authorization_header) is not str or \
+                not authorization_header.startswith('Basic '):
             return None
         return authorization_header[6:]
 
@@ -22,8 +22,8 @@ class BasicAuth(Auth):
                                            base64_authorization_header: str
                                            ) -> str:
         """decodes base64 authorization header method"""
-        if base64_authorization_header is None or
-        \ type(base64_authorization_header) is not str:
+        if base64_authorization_header is None or \
+                type(base64_authorization_header) is not str:
             return None
         try:
             return base64.b64decode(
@@ -35,17 +35,17 @@ class BasicAuth(Auth):
                                  decoded_base64_authorization_header: str
                                  ) -> Tuple['str', 'str']:
         """extract user credentials method"""
-        if decoded_base64_authorization_header is None or
-        \ type(decoded_base64_authorization_header) is not str or
-        \ ':' not in decoded_base64_authorization_header:
+        if decoded_base64_authorization_header is None or \
+                type(decoded_base64_authorization_header) is not str or \
+                ':' not in decoded_base64_authorization_header:
             return (None, None)
         return tuple(decoded_base64_authorization_header.split(':', 1))
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str
                                      ) -> TypeVar('User'):
         """User object from credentials method"""
-        if user_email is None or type(user_email) is not str or
-        \ user_pwd is None or type(user_pwd) is not str:
+        if user_email is None or type(user_email) is not str or \
+                user_pwd is None or type(user_pwd) is not str:
             return None
             from models.user import User
         try:
