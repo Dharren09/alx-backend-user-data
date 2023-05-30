@@ -4,6 +4,7 @@ from typing import List, TypeVar, Tuple
 from .auth import Auth
 import base64
 import binascii
+from models.user import User
 
 
 class BasicAuth(Auth):
@@ -27,7 +28,7 @@ class BasicAuth(Auth):
             return None
         try:
             return base64.b64decode(
-                base64_authorization_header).decode('utf-8')
+                base64_authorization_header).decode('utf-8', errors='replace')
         except binascii.Error:
             return None
 
@@ -47,7 +48,6 @@ class BasicAuth(Auth):
         if user_email is None or type(user_email) is not str or \
                 user_pwd is None or type(user_pwd) is not str:
             return None
-            from models.user import User
         try:
             users = User.search({'email': user_email})
         except Exception:
