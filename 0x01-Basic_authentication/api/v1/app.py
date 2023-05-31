@@ -19,6 +19,15 @@ if os.getenv('AUTH_TYPE') == 'auth':
 elif os.getenv('AUTH_TYPE') == 'basic_auth':
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
+elif os.getenv('AUTH_TYPE') == 'session_auth':
+    from api.v1.auth.session_auth import SessionAuth
+    auth = SessionAuth()
+elif os.getenv('AUTH_TYPE') == 'session_exp_auth':
+    from api.v1.auth.session_exp_auth import SessionExpAuth
+    auth = SessionExpAuth()
+elif os.getenv('AUTH_TYPE') == 'session_db_auth':
+    from api.v1.auth.session_db_auth import SessionDBAuth
+    auth = SessionDBAuth()
 
 
 @app.errorhandler(404)
@@ -46,13 +55,16 @@ def before_request_func() -> str:
         return
     excluded_paths = ['/api/v1/status/',
                       '/api/v1/unauthorized/',
-                      '/api/v1/forbidden/', ]
+                      '/api/v1/forbidden/',
+                      '/api/v1/auth_session/login/']
     if not auth.require_auth(request.path, excluded_paths):
         return
-    if auth.authorization_header(request) is None:
+    if auth.authorization_header(request) is None and \
+            auth.session_cookie(request) is None:
         abort(401)
     if auth.current_user(request) is None:
         abort(403)
+    request.current_user = auth.current_user(request)
 
 
 if __name__ == "__main__":
