@@ -31,10 +31,6 @@ class Auth:
             return self._db.add_user(email, _hash_password(password))
         raise ValueError("User {} already exists".format(email))
 
-        hashed_password = self._hash_password(password)
-        new_user = self._db.add_user(email, hashed_password)
-        return new_user
-
     def valid_login(self, email, password) -> bool:
         """checks if users login creditials are authentic"""
         user = None
