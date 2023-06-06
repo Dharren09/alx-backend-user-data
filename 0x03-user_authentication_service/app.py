@@ -10,7 +10,7 @@ AUTH = Auth()
 
 @app.route("/", methods=["GET"], strict_slashes=False)
 def index() -> str:
-    """initial route"""
+    """initial route / welcome banner"""
     return jsonify({"message": "Bienvenue"})
 
 
