@@ -8,6 +8,7 @@ Base = declarative_base()
 
 
 class User(Base):
+    """reps' records from the database table 'users'"""
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
