@@ -18,7 +18,7 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(bind=self._engine)
         Base.metadata.create_all(bind=self._engine)
         self.__session = None
@@ -32,7 +32,6 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    
     def add_user(self, email: str, hashed_password: str) -> User:
         """the method adds and saves a user to the db"""
         try:
@@ -44,7 +43,6 @@ class DB:
             new_user = None
         return new_user
 
-    
     def find_user_by(self, **kwargs) -> User:
         """this method takes arbitrary keyword args and return the first row
         found in the database table, finds a user based a set of filters"""
@@ -62,7 +60,6 @@ class DB:
             raise NoResultFound()
         return result
 
-    
     def update_user(self, user_id: int, **kwargs) -> None:
         """Updates a user basing on their user id"""
         user = self.find_user_by(id=user_id)
